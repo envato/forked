@@ -1,4 +1,5 @@
 RSpec.describe Forked::RetryStrategies::Always do
+  let(:ready_to_stop) { ->{} }
   let(:logger) { instance_double(Logger, error: nil) }
   let(:on_error) { instance_double(Proc, call: nil) }
   subject(:always) { described_class.new(logger: logger, on_error: on_error) }
@@ -10,7 +11,7 @@ RSpec.describe Forked::RetryStrategies::Always do
 
   it "doesn't swallow errors" do
     expect {
-      always.run(-{}) { raise 'boo' }
+      always.run(ready_to_stop) { raise StandardError, 'boo' }
     }.to raise_error StandardError
   end
 

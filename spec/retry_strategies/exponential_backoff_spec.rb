@@ -1,4 +1,5 @@
 RSpec.describe Forked::RetryStrategies::ExponentialBackoff do
+  let(:ready_to_stop) { ->{} }
   let(:logger) { instance_double(Logger, error: nil) }
   let(:on_error) { instance_double(Proc, call: nil) }
   let(:raise_on_first_block) do
@@ -19,14 +20,8 @@ RSpec.describe Forked::RetryStrategies::ExponentialBackoff do
   end
 
   it 'returns the result of the block' do
-    return_value = exponential_backoff.run(->{}) { 42 }
+    return_value = exponential_backoff.run(ready_to_stop) { 42 }
     expect(return_value).to eq 42
-  end
-
-  it "doesn't swallow errors" do
-    expect {
-      exponential_backoff.run(-{}) { raise 'boo' }
-    }.to raise_error StandardError
   end
 
   it 'calls on_error on error then returns' do
