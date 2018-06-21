@@ -62,7 +62,7 @@ module Forked
     end
 
     def handle_child_exit(pid, status)
-      if status.exitstatus.zero?
+      if !status.exitstatus.nil? && status.exitstatus.zero?
         worker = @workers.delete(pid)
         @logger.info "#{worker.name || pid} exited with status 0"
       else
