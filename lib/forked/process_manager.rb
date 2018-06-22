@@ -63,7 +63,11 @@ module Forked
 
     def handle_child_exit(pid, status)
       worker = @workers.delete(pid)
-      @logger.info "#{worker.name || pid} exited with status #{status.exitstatus.inspect}"
+      if status.exited?
+        @logger.info "#{worker.name || pid} exited with status #{status.exitstatus.inspect}"
+      else
+        @logger.info "#{worker.name || pid} terminated"
+      end
       if status.exitstatus.nil? || status.exitstatus.nonzero?
         @logger.error "Restarting #{worker.name || pid}"
         fork_worker(worker)
