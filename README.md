@@ -18,7 +18,7 @@ require 'forked'
 
 process_manager = Forked::ProcessManager.new(logger: Logger.new(STDOUT), process_timeout: 5)
 
-process_manager.fork('monitor', on_error: ->(e) { puts e.inspect }) do
+process_manager.fork('monitor', on_error: ->(e, tries) { puts e.inspect }) do
   loop do
     puts "hi"
     sleep 1
