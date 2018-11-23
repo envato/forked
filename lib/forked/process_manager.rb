@@ -3,13 +3,15 @@ require 'timeout'
 
 module Forked
   class ProcessManager
+    ON_ERROR = -> (e, tries) { }
+
     def initialize(process_timeout: 5, logger: Logger.new(STDOUT))
       @process_timeout = process_timeout
       @workers = {}
       @logger = logger
     end
 
-    def fork(name = nil, retry_strategy: ::Forked::RetryStrategies::ExponentialBackoff, on_error: -> (e) {}, &block)
+    def fork(name = nil, retry_strategy: ::Forked::RetryStrategies::ExponentialBackoff, on_error: ON_ERROR, &block)
       worker = Worker.new(name, retry_strategy, on_error, block)
       fork_worker(worker)
     end
