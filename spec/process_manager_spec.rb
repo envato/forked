@@ -67,8 +67,7 @@ RSpec.describe Forked::ProcessManager do
   end
 
   describe Forked::RetryStrategies::Always do
-    let(:on_error) { double(call: true) }
-    subject(:always) { described_class.new(logger: logger, on_error: on_error) }
+    subject(:always) { described_class.new(logger: logger, on_error: Forked::ProcessManager::ON_ERROR) }
 
     it 'raises' do
       expect {
@@ -80,8 +79,7 @@ RSpec.describe Forked::ProcessManager do
   end
 
   describe Forked::RetryStrategies::ExponentialBackoff do
-    let(:on_error) { double(call: true) }
-    subject(:always) { described_class.new(logger: logger, on_error: on_error) }
+    subject(:always) { described_class.new(logger: logger, on_error: Forked::ProcessManager::ON_ERROR) }
 
     it 'raises' do
       expect {
