@@ -9,7 +9,7 @@ module Forked
       @logger = logger
     end
 
-    def fork(name = nil, retry_strategy: ::Forked::RetryStrategies::ExponentialBackoff, on_error: -> (e) {}, &block)
+    def fork(name = nil, retry_strategy: ::Forked::RetryStrategies::ExponentialBackoff, on_error: -> (e, tries) {}, &block)
       worker = Worker.new(name, retry_strategy, on_error, block)
       fork_worker(worker)
     end
