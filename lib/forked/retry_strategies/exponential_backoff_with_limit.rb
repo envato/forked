@@ -1,11 +1,11 @@
 module Forked
   module RetryStrategies
     class ExponentialBackoffWithLimit
-      def initialize(logger:, on_error:, backoff_factor: 2, limit: 8)
+      def initialize(logger:, on_error:, backoff_factor: 2, limit: nil)
         @logger = logger
         @on_error = on_error
         @backoff_factor = backoff_factor
-        @limit = 8
+        @limit = limit || 8
       end
 
       def run(ready_to_stop, &block)

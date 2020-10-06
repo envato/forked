@@ -11,8 +11,14 @@ module Forked
       @logger = logger
     end
 
-    def fork(name = nil, retry_strategy: ::Forked::RetryStrategies::ExponentialBackoff, on_error: ON_ERROR, &block)
-      worker = Worker.new(name, retry_strategy, on_error, block)
+    def fork(name = nil, retry_strategy: ::Forked::RetryStrategies::ExponentialBackoff, retry_backoff_limit: nil, on_error: ON_ERROR, &block)
+      worker = Worker.new(
+        name: name,
+        retry_strategy: retry_strategy,
+        retry_backoff_limit: retry_backoff_limit,
+        on_error: on_error,
+        block: block,
+      )
       fork_worker(worker)
     end
 
@@ -37,7 +43,10 @@ module Forked
     private
 
     def fork_worker(worker)
-      retry_strategy = worker.retry_strategy.new(logger: @logger, on_error: worker.on_error)
+      retry_params = { logger: @logger, on_error: worker.on_error }
+      retry_params[:limit] = worker.retry_backoff_limit if worker.retry_strategy == RetryStrategies::ExponentialBackoffWithLimit
+      retry_strategy = worker.retry_strategy.new(retry_params)
+
       pid = Kernel.fork do
         WithGracefulShutdown.run(logger: @logger) do |ready_to_stop|
           retry_strategy.run(ready_to_stop) do
