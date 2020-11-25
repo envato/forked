@@ -18,16 +18,31 @@ require 'forked'
 
 process_manager = Forked::ProcessManager.new(logger: Logger.new(STDOUT), process_timeout: 5)
 
-process_manager.fork('monitor', on_error: ->(e, tries) { puts e.inspect }) do
+# Default retry_strategy = Forked::RetryStrategies::Always
+# Calling `ready_to_stop` within the loop ensures a shutdown is triggered if a TERM/INT signal is received
+process_manager.fork('monitor', on_error: ->(e, tries) { puts e.inspect }) do |ready_to_stop|
   loop do
-    puts "hi"
-    sleep 1
+    ready_to_stop.call
+    # do something
   end
 end
 
+# Using the ExponentialBackoff retry_strategy
+# If there is an error, process_manager backs off for a time then restarts the loop
+# The back off time increases as the number of errors increase
 process_manager.fork('processor_1', retry_strategy: Forked::RetryStrategies::ExponentialBackoff) do |ready_to_stop|
   loop do
-    ready_to_stop.call # triggers a shutdown if a TERM/INT signal has been received
+    ready_to_stop.call
+    # do something
+  end
+end
+
+# Using the ExponentialBackoffWithLimit retry_strategy
+# Follows the ExponentialBackoff retry strategy, but if the error keeps occurring
+#   until a given limit (default: 8), the error bubbles up and the loop is not restarted
+process_manager.fork('processor_1', retry_strategy: Forked::RetryStrategies::ExponentialBackoff, retry_backoff_limit: 10) do |ready_to_stop|
+  loop do
+    ready_to_stop.call
     # do something
   end
 end
