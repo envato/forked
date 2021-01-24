@@ -1,5 +1,7 @@
 # Forked
 
+[![Test Suite](https://github.com/envato/forked/workflows/tests/badge.svg?branch=master)](https://github.com/envato/forked/actions?query=branch%3Amaster+workflow%3Atests)
+
 Forked manages long running worker processes.
 
 Processes that crash are restarted, whereas processes that exit successfully
