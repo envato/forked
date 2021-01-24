@@ -1,5 +1,8 @@
 # Forked
 
+[![License MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/envato/forked/blob/master/LICENSE.txt)
+[![Gem Version](https://img.shields.io/gem/v/forked.svg?maxAge=2592000)](https://rubygems.org/gems/forked)
+[![Gem Downloads](https://img.shields.io/gem/dt/forked.svg?maxAge=2592000)](https://rubygems.org/gems/forked)
 [![Test Suite](https://github.com/envato/forked/workflows/tests/badge.svg?branch=master)](https://github.com/envato/forked/actions?query=branch%3Amaster+workflow%3Atests)
 
 Forked manages long running worker processes.
