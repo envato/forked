@@ -45,7 +45,7 @@ end
 # Using the ExponentialBackoffWithLimit retry_strategy
 # Follows the ExponentialBackoff retry strategy, but if the error keeps occurring
 #   until a given limit (default: 8), the error bubbles up and the loop is not restarted
-process_manager.fork('processor_1', retry_strategy: Forked::RetryStrategies::ExponentialBackoff, retry_backoff_limit: 10) do |ready_to_stop|
+process_manager.fork('processor_1', retry_strategy: Forked::RetryStrategies::ExponentialBackoffWithLimit, retry_backoff_limit: 10) do |ready_to_stop|
   loop do
     ready_to_stop.call
     # do something
