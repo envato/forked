@@ -45,7 +45,7 @@ module Forked
     def fork_worker(worker)
       retry_params = { logger: @logger, on_error: worker.on_error }
       retry_params[:limit] = worker.retry_backoff_limit if worker.retry_strategy == RetryStrategies::ExponentialBackoffWithLimit
-      retry_strategy = worker.retry_strategy.new(retry_params)
+      retry_strategy = worker.retry_strategy.new(**retry_params)
 
       pid = Kernel.fork do
         WithGracefulShutdown.run(logger: @logger) do |ready_to_stop|
