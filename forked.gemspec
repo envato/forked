@@ -13,8 +13,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{}
   spec.homepage      = "https://github.com/envato/forked"
 
-  spec.files = Dir["lib/**/*.rb"]
-  spec.files += Dir['[A-Z]*']
+  spec.files = Dir["lib/**/*.rb"] + Dir["*.txt"] + Dir["*.md"]
   spec.require_paths = ['lib']
 
   spec.bindir        = "exe"
