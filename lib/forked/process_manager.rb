@@ -79,8 +79,12 @@ module Forked
       elsif status.coredump?
         @logger.error "#{worker.name || pid} exited with a coredump"
       else
-        termsig = status.termsig || 'no uncaught signal'
-        @logger.info "#{worker.name || pid} terminated with #{termsig}"
+        signame = if status.termsig.nil?
+                    'no uncaught signal'
+                  else
+                    Signal.signame(status.termsig)
+                  end
+        @logger.error "#{worker.name || pid} terminated with #{signame}"
       end
       if status.exitstatus.nil? || status.exitstatus.nonzero?
         @logger.error "Restarting #{worker.name || pid}"
