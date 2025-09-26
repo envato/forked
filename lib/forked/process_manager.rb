@@ -76,8 +76,15 @@ module Forked
       worker = @workers.delete(pid)
       if status.exited?
         @logger.info "#{worker.name || pid} exited with status #{status.exitstatus.inspect}"
+      elsif status.coredump?
+        @logger.error "#{worker.name || pid} exited with a coredump"
       else
-        @logger.info "#{worker.name || pid} terminated"
+        signame = if status.termsig.nil?
+                    'no uncaught signal'
+                  else
+                    Signal.signame(status.termsig)
+                  end
+        @logger.error "#{worker.name || pid} terminated with #{signame}"
       end
       if status.exitstatus.nil? || status.exitstatus.nonzero?
         @logger.error "Restarting #{worker.name || pid}"
