@@ -89,7 +89,7 @@ module Forked
         @logger.error "#{identifier} terminated with #{signame}"
       end
       if status.exitstatus.nil? || status.exitstatus.nonzero?
-        @logger.error "Restarting #{worker.name || pid}"
+        @logger.error "Restarting #{identifier}"
         fork_worker(worker)
       end
     end
