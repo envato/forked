@@ -74,17 +74,19 @@ module Forked
 
     def handle_child_exit(pid, status)
       worker = @workers.delete(pid)
+      identifier = worker&.name || pid
+
       if status.exited?
-        @logger.info "#{worker.name || pid} exited with status #{status.exitstatus.inspect}"
+        @logger.info "#{identifier} exited with status #{status.exitstatus.inspect}"
       elsif status.coredump?
-        @logger.error "#{worker.name || pid} exited with a coredump"
+        @logger.error "#{identifier} exited with a coredump"
       else
         signame = if status.termsig.nil?
                     'no uncaught signal'
                   else
                     Signal.signame(status.termsig)
                   end
-        @logger.error "#{worker.name || pid} terminated with #{signame}"
+        @logger.error "#{identifier} terminated with #{signame}"
       end
       if status.exitstatus.nil? || status.exitstatus.nonzero?
         @logger.error "Restarting #{worker.name || pid}"
