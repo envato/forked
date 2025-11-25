@@ -88,10 +88,10 @@ module Forked
                   end
         @logger.error "#{identifier} terminated with #{signame}"
       end
-      if worker && status.exitstatus.nil? || status.exitstatus.nonzero?
-        @logger.error "Restarting #{identifier}"
-        fork_worker(worker)
-      end
+      return if @shutdown_requested || worker.nil? || status.exitstatus.zero?
+
+      @logger.error "Process #{identifier} crashed, restarting"
+      fork_worker(worker)
     end
 
     def trap_shutdown_signals
