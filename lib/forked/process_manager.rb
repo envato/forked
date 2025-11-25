@@ -88,7 +88,7 @@ module Forked
                   end
         @logger.error "#{identifier} terminated with #{signame}"
       end
-      if status.exitstatus.nil? || status.exitstatus.nonzero?
+      if worker && status.exitstatus.nil? || status.exitstatus.nonzero?
         @logger.error "Restarting #{identifier}"
         fork_worker(worker)
       end
