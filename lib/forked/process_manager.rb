@@ -118,7 +118,7 @@ module Forked
     def send_signal_to_workers(signal)
       return if @workers.empty?
 
-      @logger.info "Sending #{signal} to: #{@workers.map { |pid, name| "\n - #{name} (pid #{pid})" }}"
+      @logger.info "Sending #{signal} to: #{@workers.map { |pid, worker| "#{worker.name} (pid #{pid})" }.join("\n")}"
       @workers.each_key do |pid|
         Process.kill(signal, pid)
       rescue Errno::ESRCH
