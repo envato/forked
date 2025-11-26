@@ -116,17 +116,15 @@ module Forked
     end
 
     def send_signal_to_workers(signal)
-      if !@workers.empty?
-        @logger.info "Sending #{signal} to #{@workers.keys}"
-        @workers.each_key do |pid|
-          begin
-            Process.kill(signal, pid)
-          rescue Errno::ESRCH => e
-            # Errno::ESRCH: No such process
-            # Move along if the process is already dead
-            @workers.delete(pid)
-          end
-        end
+      return if @workers.empty?
+
+      @logger.info "Sending #{signal} to: #{@workers.map { |pid, name| "\n - #{name} (pid #{pid})" }}"
+      @workers.each_key do |pid|
+        Process.kill(signal, pid)
+      rescue Errno::ESRCH
+        # Errno::ESRCH: No such process
+        # Move along if the process is already dead
+        @workers.delete(pid)
       end
     end
 
