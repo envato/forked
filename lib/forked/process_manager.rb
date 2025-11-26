@@ -110,7 +110,7 @@ module Forked
       @waiting_since = Time.now
       until @workers.empty? || timed_out?(@waiting_since)
         # Returns nil immediately if no child process exists
-        pid, status = Process.wait2(-1, Process::WNOHANG)
+        pid, _status = Process.wait2(-1, Process::WNOHANG)
         @workers.delete(pid) if pid
       end
     end
