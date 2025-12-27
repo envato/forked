@@ -8,17 +8,27 @@ Gem::Specification.new do |spec|
   spec.version       = Forked::VERSION
   spec.authors       = ["Steve Hodgkiss"]
   spec.email         = ["steve@hodgkiss.me"]
+  spec.license       = "MIT"
 
-  spec.summary       = %q{Manage long running forked processes}
-  spec.description   = %q{}
+  spec.summary       = "Manage long running forked processes"
+  spec.description   = ""
   spec.homepage      = "https://github.com/envato/forked"
 
-  spec.files = Dir["lib/**/*.rb"] + Dir["*.txt"] + Dir["*.md"]
-  spec.require_paths = ['lib']
+  spec.metadata      = {
+    "allowed_push_host" => "https://rubygems.org",
+    "bug_tracker_uri"   => "#{spec.homepage}/issues",
+    "changelog_uri"     => "#{spec.homepage}/releases",
+    "documentation_uri" => "https://www.rubydoc.info/gems/forked/#{spec.version}",
+    "source_code_uri"   => spec.homepage,
+  }
 
-  spec.add_dependency 'logger', '~> 1'
+  spec.required_ruby_version = ">= 2.5.0"
+
+  spec.files = Dir["lib/**/*.rb"] + Dir["*.txt"] + Dir["*.md"]
+  spec.require_paths = ["lib"]
+
+  spec.add_dependency "logger", "~> 1"
 
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib"]
 end
