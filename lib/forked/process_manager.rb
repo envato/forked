@@ -74,15 +74,24 @@ module Forked
 
     def handle_child_exit(pid, status)
       worker = @workers.delete(pid)
+      identifier = worker&.name || pid
+
       if status.exited?
-        @logger.info "#{worker.name || pid} exited with status #{status.exitstatus.inspect}"
+        @logger.info "#{identifier} exited with status #{status.exitstatus.inspect}"
+      elsif status.coredump?
+        @logger.error "#{identifier} exited with a coredump"
       else
-        @logger.info "#{worker.name || pid} terminated"
+        signame = if status.termsig.nil?
+                    'no uncaught signal'
+                  else
+                    Signal.signame(status.termsig)
+                  end
+        @logger.error "#{identifier} terminated with #{signame}"
       end
-      if status.exitstatus.nil? || status.exitstatus.nonzero?
-        @logger.error "Restarting #{worker.name || pid}"
-        fork_worker(worker)
-      end
+      return if @shutdown_requested || worker.nil? || status.exitstatus&.zero?
+
+      @logger.error "Process #{identifier} crashed, restarting"
+      fork_worker(worker)
     end
 
     def trap_shutdown_signals
@@ -101,23 +110,21 @@ module Forked
       @waiting_since = Time.now
       until @workers.empty? || timed_out?(@waiting_since)
         # Returns nil immediately if no child process exists
-        pid, status = Process.wait2(-1, Process::WNOHANG)
+        pid, _status = Process.wait2(-1, Process::WNOHANG)
         @workers.delete(pid) if pid
       end
     end
 
     def send_signal_to_workers(signal)
-      if !@workers.empty?
-        @logger.info "Sending #{signal} to #{@workers.keys}"
-        @workers.each_key do |pid|
-          begin
-            Process.kill(signal, pid)
-          rescue Errno::ESRCH => e
-            # Errno::ESRCH: No such process
-            # Move along if the process is already dead
-            @workers.delete(pid)
-          end
-        end
+      return if @workers.empty?
+
+      @logger.info "Sending #{signal} to: #{@workers.map { |pid, worker| "#{worker.name} (pid #{pid})" }.join("\n")}"
+      @workers.each_key do |pid|
+        Process.kill(signal, pid)
+      rescue Errno::ESRCH
+        # Errno::ESRCH: No such process
+        # Move along if the process is already dead
+        @workers.delete(pid)
       end
     end
 
